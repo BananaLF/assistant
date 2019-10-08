@@ -2,6 +2,13 @@ var syncStart = false
 var localDate = 0
 var oldTime = 0
 var oldPrice = 0
+//notifySyncData()
+
+chrome.browserAction.onClicked.addListener(function(tab) {
+    chrome.tabs.executeScript(tab.id, {file: 'jquery.min.js'});
+    chrome.tabs.executeScript(tab.id, {file: 'content.js'});
+});
+
 $(function(){
     var state = $('#state');
     $('#startSync').click(function () {//给对象绑定事件
@@ -10,6 +17,10 @@ $(function(){
     $('#stopSync').click(function () {//给对象绑定事件
         stopSync()
     });
+    $('#singleSend').click(function () {
+        console.log("start to send")
+        notifySendPrice()
+    })
 })
 
 //开始同步自动报价
@@ -21,7 +32,6 @@ function startSync() {
     setTimeout(function () {
         TimeDown();
     }, 100)
-
 }
 
 //停止同步自动报价
@@ -50,7 +60,7 @@ function notifySyncData() {
             action: "syncData",
         }, function (response) {
             console.log("syncData",response)
-            updateData(response.lifeiTime,response.lifeiPrice)
+            updateData(response.lastTime,response.currentPrice)
             updateUI()
         });
     });
@@ -63,7 +73,7 @@ function TimeDown() {
         return;
     }
 
-    if (localDate < 500) {
+    if (localDate < 700) {
         notifySendPrice()
         console.log("sync had stop")
         alert("发送成功")
@@ -89,9 +99,11 @@ function updateData(syncTime,syncPrice) {
     } else if (localDate == syncTime) {
         return;
     } else if (localDate > syncTime) {
+        console.log("localDate > syncTime :",localDate-syncTime)
         oldTime = syncTime
         localDate = syncTime
     } else if (localDate < syncTime) {
+        console.log("localDate < syncTime :",localDate-syncTime)
         oldTime = syncTime
         localDate = syncTime
     }
