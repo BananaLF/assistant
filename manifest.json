@@ -14,5 +14,6 @@
       "js": ["jquery-3.4.1.min.js","contentScript.js"]
     }
   ],
-  "permissions" : ["tabs", "activeTab"]
+  "permissions" : ["tabs", "activeTab"],
+  "web_accessible_resources": ["inject.js"]
 }

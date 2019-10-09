@@ -7,8 +7,13 @@
     <script src="assistant.js"></script>
 </head>
 <body style="width:300px ;height:100px">
-<span>时间剩余:</span><span  id="currentTimeText" style="color:orangered">0</span><span style="color:orangered">毫秒</span><br/>
-<span>最新价格:</span><span  id="currentPriceText" style="color:orangered">0</span><span style="color:orangered">元</span><br/>
+<span>模式:</span><span  id="appModeText" style="color:orangered">未知</span><br/>
+<span>最新价格:</span><span  id="currentPriceText" style="color:orangered">0</span><span style="color:orangered">毫秒</span><br/>
+<span>我的价格:</span><span  id="myPriceText" style="color:orangered">0</span><span style="color:orangered">元</span><br/>
+<br/>
+<span>自动报价状态:</span><span  id="appStatusText" style="color:orangered">已停止</span><br/>
+<span>我的最高报价:</span><input  id="maxPriceText"></input><br/>
+<span>步长:</span><input  id="intervalText"></input><br/>
 
 <button id="startSync">开始</button>
 <button id="stopSync">停止</button>
