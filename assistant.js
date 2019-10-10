@@ -4,6 +4,7 @@ var myPrice = 0
 var appMode = "单价"
 var interval = 0
 var maxPrice = 0
+var sendPriceHistory = 0
 //notifySyncData()
 
 chrome.browserAction.onClicked.addListener(function(tab) {
@@ -111,6 +112,19 @@ function updateUI() {
 }
 
 function autoCheck() {
+    //如果发送历史不等于我的价格说明,发送未成功(还需出去为0的情况初始化),这是需要等待而不是去重新发送
+    if (sendPriceHistory != myPrice && sendPriceHistory != 0) {
+        //检测是否发送历史的价格是否有用,无用的话需要重新发送
+        //当前价格超过我的发送历史,或者当前价格为我的发送历史,但是不是我发送的,即是我发送的历史价格无用不需要等待 需要重新发送新的价格
+        if (syncPrice > sendPriceHistory || syncPrice == sendPriceHistory) {
+            console.log("发送历史价格无用需要重新发送")
+        } else {
+            //发送历史价格还有需要等待
+            console.log("已经发送了一个价格:",sendPriceHistory)
+            return;
+        }
+    }
+
     if (syncPrice != myPrice) {
         if (appMode == "单价") {
             //发送
@@ -129,6 +143,8 @@ function autoCheck() {
                 alert("价格超过预期,停止自动报价")
                 return;
             }
+            sendPriceHistory = preparePrice
+            console.log("准备报价:",preparePrice)
             notifySendPrice(preparePrice)
         } else {
             syncStart = false
