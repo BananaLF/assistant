@@ -1,10 +1,12 @@
 var syncStart = false
 var syncPrice = 0
 var myPrice = 0
+var num = 0
 var appMode = "单价"
 var interval = 0
 var maxPrice = 0
 var sendPriceHistory = 0
+var pause = false
 //notifySyncData()
 
 chrome.browserAction.onClicked.addListener(function(tab) {
@@ -23,10 +25,6 @@ $(function(){
         updateUI()
         stopSync()
     });
-    $('#singleSend').click(function () {
-        console.log("start to send")
-        notifySendPrice(1)
-    })
 })
 
 //开始同步自动报价
@@ -47,12 +45,13 @@ function stopSync() {
 }
 
 //通知contentScript 向目标界面发送最后价格
-function notifySendPrice(price) {
+function notifySendPrice(price,totalPrice) {
     chrome.tabs.query({active:true, currentWindow:true}, function (tab) {//获取当前tab
         //向tab发送请求
         chrome.tabs.sendMessage(tab[0].id, {
             action: "start",
             price:price,
+            totoalPrice:totalPrice,
             mode:appMode,
         }, function (response) {
             console.log(response);
@@ -135,7 +134,8 @@ function autoCheck() {
                 alert("未知错误,停止自动报价")
                 return
             }
-
+            num = divfloat(parseFloat(priceArray[0]),parseFloat(priceArray[1]))
+            num = Math.round(num*100)/100
             var preparePrice = parseFloat(priceArray[1])
             preparePrice = preparePrice + interval
             if (preparePrice > maxPrice) {
@@ -144,16 +144,15 @@ function autoCheck() {
                 return;
             }
             sendPriceHistory = preparePrice
-            console.log("准备报价:",preparePrice)
-            notifySendPrice(preparePrice)
+            var prepareTotalPrice = mulfloat(num,preparePrice)
+            console.log("准备报价:",preparePrice,prepareTotalPrice)
+            notifySendPrice(preparePrice,prepareTotalPrice)
         } else {
             syncStart = false
             alert("未知模式类型,停止自动报价")
             return;
         }
     } else {
-        syncStart = false
-        alert("数据同步错误,停止自动报价")
-        return;
+        console.log("当前价格和我的价格相同")
     }
 }

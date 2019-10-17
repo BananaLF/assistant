@@ -18,12 +18,12 @@ chrome.runtime.onMessage.addListener(
                     sendResponse({state:'发送失败,无法找到价格输入DOM,未知标签类型'+input[0].tagName});
                 }
                 input[0].value = request.price
+                contentDocument.getElementById("packSumPriceId").innerHTML = request.totoalPrice
             } else {
                 sendResponse({state:'发送失败,未知模式'});
             }
-            contentDocument.getElementById("bidBtnId").disabled = false
             //TODO 需要测试后 才开放自动点击按钮
-            //contentDocument.getElementById("bidBtnId").click()
+            contentDocument.getElementById("bidBtnId").click()
             sendResponse({state:'发送成功'});
         }
         if (request.action == "syncData") {
