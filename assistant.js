@@ -121,6 +121,7 @@ function autoCheck() {
         if (getSignalPrice(syncPrice)[1] > getSignalPrice(sendPriceHistory)[1]) {
             console.log("发送历史价格无用,需要重新发送")
         } else {
+            //TODO 如果当前价格为发送历史说明我发送失败,这时页面上应该跳转出我发送失败了,这时需要停止程序,重新启动程序
             //发送历史价格还有需要等待
             console.log("已经发送了一个价格:",sendPriceHistory)
             return;
