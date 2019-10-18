@@ -42,6 +42,8 @@ function startSync() {
 function stopSync() {
     console.log("stopSync");
     syncStart = false
+    sendPriceHistory = 0
+    waitTime = 0
 }
 
 //通知contentScript 向目标界面发送最后价格
@@ -114,9 +116,10 @@ function autoCheck() {
     //如果发送历史不等于我的价格说明,发送未成功(还需出去为0的情况初始化),这是需要等待而不是去重新发送
     if (sendPriceHistory != myPrice && sendPriceHistory != 0) {
         //检测是否发送历史的价格是否有用,无用的话需要重新发送
-        //当前价格超过我的发送历史,或者当前价格为我的发送历史,但是不是我发送的,即是我发送的历史价格无用不需要等待 需要重新发送新的价格
-        if (syncPrice > sendPriceHistory || syncPrice == sendPriceHistory) {
-            console.log("发送历史价格无用需要重新发送")
+        //当前价格超过我的发送历史即是我发送的历史价格无用不需要等待 需要重新发送新的价格
+        console.log("检测历史记录:",syncPrice,getSignalPrice(syncPrice)[1],sendPriceHistory,getSignalPrice(sendPriceHistory)[1])
+        if (getSignalPrice(syncPrice)[1] > getSignalPrice(sendPriceHistory)[1]) {
+            console.log("发送历史价格无用,需要重新发送")
         } else {
             //发送历史价格还有需要等待
             console.log("已经发送了一个价格:",sendPriceHistory)
@@ -124,7 +127,8 @@ function autoCheck() {
         }
     }
 
-    if (syncPrice != myPrice) {
+    console.log("syncPirce和myPrice:",syncPrice,getSignalPrice(syncPrice)[1],myPrice,getSignalPrice(myPrice)[1])
+    if (getSignalPrice(syncPrice)[1] > getSignalPrice(myPrice)[1]) {
         if (appMode == "单价") {
             //发送
             var priceArray= new Array();
@@ -143,9 +147,9 @@ function autoCheck() {
                 alert("价格超过预期,停止自动报价")
                 return;
             }
-            sendPriceHistory = preparePrice
             var prepareTotalPrice = mulfloat(num,preparePrice)
-            console.log("准备报价:",preparePrice,prepareTotalPrice)
+            sendPriceHistory = prepareTotalPrice +"/"+preparePrice
+            console.log("准备报价:",sendPriceHistory)
             notifySendPrice(preparePrice,prepareTotalPrice)
         } else {
             syncStart = false
@@ -155,4 +159,12 @@ function autoCheck() {
     } else {
         console.log("当前价格和我的价格相同")
     }
+}
+
+function getSignalPrice(price) {
+    var priceArray=price.split("/");
+    if (priceArray.length != 2) {
+        return -1,-1
+    }
+    return [parseFloat(priceArray[0]),parseFloat(priceArray[1])]
 }
